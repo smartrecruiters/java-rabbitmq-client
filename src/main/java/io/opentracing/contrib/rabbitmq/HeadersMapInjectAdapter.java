@@ -13,9 +13,11 @@
  */
 package io.opentracing.contrib.rabbitmq;
 
-import io.opentracing.propagation.TextMap;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import io.opentracing.propagation.TextMap;
 
 
 public class HeadersMapInjectAdapter implements TextMap {
@@ -23,7 +25,9 @@ public class HeadersMapInjectAdapter implements TextMap {
   private final Map<String, Object> headers;
 
   public HeadersMapInjectAdapter(Map<String, Object> headers) {
-    this.headers = headers;
+    // CNC-194 - SR workaround for immutable headers map
+      // Version: opentracing-rabbitmq-client:0.1.12-SR1
+    this.headers = new HashMap<>(headers);
   }
 
   @Override
