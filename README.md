@@ -1,54 +1,36 @@
-[![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Released Version][maven-img]][maven] [![Apache-2.0 license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+# Purpose
+This is overridden version of [opentracing-contrib/java-rabbitmq-client](https://github.com/opentracing-contrib/java-rabbitmq-client) that fixes library problems.
+Library is deprecated and not maintained anymore.
+It should replaced with OpenTelemetry.
 
-# OpenTracing RabbitMQ Client Instrumentation
-OpenTracing instrumentation for RabbitMQ Client.
+In the meantime, all fixes for SmartRecruiters will reside here.
 
-## Installation
-
-pom.xml
+# Publishing changes
+1. Adjust version in `pom.xml`
+2. Replace `{SR Nexus URL}` in `pom.xml` with URL to nexus
+3. Create settings for maven in `~/.m2/settings.xml
 ```xml
-<dependency>
-    <groupId>io.opentracing.contrib</groupId>
-    <artifactId>opentracing-rabbitmq-client</artifactId>
-    <version>VERSION</version>
-</dependency>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+    https://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <localRepository/>
+    <interactiveMode/>
+    <usePluginRegistry/>
+    <offline/>
+    <pluginGroups/>
+    <servers>
+        <server>
+            <id>sr-nexus</id>
+            <username>*********************************************</username>
+            <password>*******************************</password>
+        </server>
+    </servers>
+    <mirrors/>
+    <proxies/>
+    <profiles/>
+    <activeProfiles/>
+</settings>
 ```
-
-## Usage
-
-
-```java
-// Instantiate tracer
-Tracer tracer = ...
-
-// Optionally register tracer with GlobalTracer
-GlobalTracer.register(tracer);
-
-// Decorate RabbitMQ Channel with TracingChannel
-TracingChannel tracingChannel = new TracingChannel(channel, tracer);
-
-// Send
-tracingChannel.basicPublish(...);
-
-// Get
-GetResponse response = tracingChannel.basicGet(queueName, false);
-
-// Consume
-tracingChannel.basicConsume(...);
-
-// Factory
-ConnectionFactory factory = new TracingConnectionFactory(tracer);
-Connection connection = factory.newConnection();
-
-```
-
-## License
-
-[Apache 2.0 License](./LICENSE).
-
-[ci-img]: https://travis-ci.org/opentracing-contrib/java-rabbitmq-client.svg?branch=master
-[ci]: https://travis-ci.org/opentracing-contrib/java-rabbitmq-client
-[cov-img]: https://coveralls.io/repos/github/opentracing-contrib/java-rabbitmq-client/badge.svg?branch=master
-[cov]: https://coveralls.io/github/opentracing-contrib/java-rabbitmq-client?branch=master
-[maven-img]: https://img.shields.io/maven-central/v/io.opentracing.contrib/opentracing-rabbitmq-client.svg
-[maven]: http://search.maven.org/#search%7Cga%7C1%7Copentracing-rabbitmq-client
+4. Run `mvn clean install`
+5. Run `mvn source:jar deploy`

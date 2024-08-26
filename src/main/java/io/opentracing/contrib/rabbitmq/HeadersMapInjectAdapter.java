@@ -13,7 +13,6 @@
  */
 package io.opentracing.contrib.rabbitmq;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -22,21 +21,25 @@ import io.opentracing.propagation.TextMap;
 
 public class HeadersMapInjectAdapter implements TextMap {
 
-  private final Map<String, Object> headers;
+    private final Map<String, Object> headers;
 
-  public HeadersMapInjectAdapter(Map<String, Object> headers) {
-    // CNC-194 - SR workaround for immutable headers map
-      // Version: opentracing-rabbitmq-client:0.1.12-SR1
-    this.headers = new HashMap<>(headers);
-  }
+    public HeadersMapInjectAdapter(Map<String, Object> headers) {
+        this.headers = headers;
+    }
 
-  @Override
-  public Iterator<Map.Entry<String, String>> iterator() {
-    throw new UnsupportedOperationException("iterator should never be used with Tracer.inject()");
-  }
+    @Override
+    public Iterator<Map.Entry<String, String>> iterator() {
+        throw new UnsupportedOperationException("iterator should never be used with Tracer.inject()");
+    }
 
-  @Override
-  public void put(String key, String value) {
-    headers.put(key, value);
-  }
+    @Override
+    public void put(String key, String value) {
+        // Version: opentracing-rabbitmq-client:0.1.12-SR2
+        try {
+            headers.put(key, value);
+        } catch (UnsupportedOperationException e) {
+            // Swallow the exception, headers are read only
+            // This code is most likely run on consumer side where rabbit mq headers are read only
+        }
+    }
 }
